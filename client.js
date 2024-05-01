@@ -15,7 +15,7 @@ client.write(JSON.stringify(req));
 
 //接続
 function connect() {
-    const client = new net.Socket();
+    const client = new net.Sogitcket();
     client.connect(port, host);
     return client;
 }

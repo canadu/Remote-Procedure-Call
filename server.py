@@ -1,6 +1,11 @@
 import socket
 import os
 import json
+import threading
+import math
+
+IPADDR = "127.0.0.1"
+PORT = 50080
 
 def floor(*param):
     data = {
@@ -11,21 +16,10 @@ def floor(*param):
     return json_data
 
 
-#モードで切り替える 0=Unixドメインソケット 1=IPv4インターネットプロトコル
-MODE = 1
+# IPv4
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = IPADDR
 
-IPADDR = "127.0.0.1"
-PORT = 50080
-
-if MODE == 0:
-    #Unixドメインソケット
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    # ソケットファイルのファイル名を指定
-    server_address = '/tmp/app_socket_file'
-else:
-    # IPv4
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_address = IPADDR
 try:
     os.unlink(server_address)
 except FileNotFoundError:
@@ -34,12 +28,9 @@ except FileNotFoundError:
 print(f'接続開始します。{server_address}')
 
 # バインド
-if MODE == 0:
-    sock.bind(server_address)
-else:
-    # 同じポートを共有して使用できるようになります。
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind((server_address, PORT))
+# 同じポートを共有して使用できるようになります。
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind((server_address, PORT))
 
 # 接続を待ち受け
 sock.listen(1)
