@@ -4,7 +4,7 @@ const host = '127.0.0.1';
 
 const req = {
    "method": "floor", 
-   "params": [42, 23], 
+   "params": [42.21], 
    "id": 1
 };
 
@@ -15,7 +15,7 @@ client.write(JSON.stringify(req));
 
 //接続
 function connect() {
-    const client = new net.Sogitcket();
+    const client = new net.Socket();
     client.connect(port, host);
     return client;
 }
