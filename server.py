@@ -1,7 +1,6 @@
 import socket
 import os
 import json
-import threading
 import math
 
 IPADDR = "127.0.0.1"
@@ -15,25 +14,30 @@ class Func:
     # validAnagram(string str1, string str2): 2 つの文字列を入力として受け取り，2 つの入力文字列が互いにアナグラムであるかどうかを示すブール値を返す。
     # sort(string[] strArr): 文字列の配列を入力として受け取り、その配列をソートして、ソート後の文字列の配列を返す。
  
-    def floor(x):
-        r = x.floor()
+    def floor(params):
+        r = math.floor(params)
         return r
 
-    def nroot(n , x):
+    def nroot(params):
+        n = params[0]
+        x = params[1]
         r = x ** (1/n)
         return r
 
-    def reverse(s):
-        r = s.reverse()
+    def reverse(params):
+        r = params[::-1]
         return r
 
-    def validAnagram(s1, s2):
+    def validAnagram(params):
+        s1 = params[0]
+        s2 = params[1]
         sorted_str1 = ''.join(sorted(set(s1.lower())))
         sorted_str2 = ''.join(sorted(set(s2.lower())))
+
         return sorted_str1 == sorted_str2
 
-    def sort(s):
-        r = s.sorted()
+    def sort(params):
+        r = sorted(params)
         return r
 
 def changeType(method, param):
@@ -47,6 +51,8 @@ def changeType(method, param):
         return str(param)
     elif method == 'sort':
         return list(param)
+    else:
+        return "Error"
 
 def main():
 
@@ -94,39 +100,28 @@ def main():
 
                 if method in FuncHashMap:
 
-                    # パラメーターの型変換
-                    print(params)
-
                     param = changeType(method, params) 
 
                     # メソッドを実行
-                    result = FuncHashMap[method](param)
-                   
+                    if param != "Error":
+                        result = FuncHashMap[method](param)
+                    else:
+                        # エラー
+                        print('エラーだよ')
+                        result = param
+                    
                     data = {
                         'results': result,
-                        'id': 1,
+                        'id': id,
                     }
 
                     json_data = json.dumps(data).encode('utf-8')
         
                     # 戻り値をクライアントに返す
-                    connection.send(resujson_datalt)
+                    connection.send(json_data)
                 
                 break
             
-                # if str(dec['method']) == 'floor':
-                #     result = floor(dec['params'])
-                #     connection.send(result)
-                #     break
-                
-                # if from_client == 'exit' or from_client == 'bye':
-                #     print('接続を切ります')
-                #     break
-                # else:
-                #     print(f"受信したメッセージ >>> {from_client}")
-                #     to_client = fake.sentence()
-                #     connection.sendall(to_client.encode("UTF-8"))
-
             except Exception as e:
                 print('エラー > ' + str(e))
                 break
