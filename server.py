@@ -14,46 +14,46 @@ class Func:
     # validAnagram(string str1, string str2): 2 つの文字列を入力として受け取り，2 つの入力文字列が互いにアナグラムであるかどうかを示すブール値を返す。
     # sort(string[] strArr): 文字列の配列を入力として受け取り、その配列をソートして、ソート後の文字列の配列を返す。
  
-    def floor(params):
-        r = math.floor(params)
+    def floor(x):
+        r = math.floor(x[0])
         return r
 
     def nroot(params):
-        n = params[0]
-        x = params[1]
+        x = params[0]
+        n  = params[1]
         r = x ** (1/n)
         return r
 
-    def reverse(params):
-        r = params[::-1]
+    def reverse(s):
+        r = s[0][::-1]
         return r
-
+    
     def validAnagram(params):
         s1 = params[0]
         s2 = params[1]
+        print(s1)
+        print(s2)
         sorted_str1 = ''.join(sorted(set(s1.lower())))
         sorted_str2 = ''.join(sorted(set(s2.lower())))
-
         return sorted_str1 == sorted_str2
 
     def sort(params):
-        r = sorted(params)
+        r = sorted(params[0])
         return r
 
-def changeType(method, param):
-    if method == 'floor':
-        return float(param)
-    elif method == 'nroot':
-        return int(param)
-    elif method == 'reverse':
-        return str(param)    
-    elif method == 'validAnagram':
-        return str(param)
-    elif method == 'sort':
-        return list(param)
-    else:
-        return "Error"
+def changeType(method, params):
 
+    params = params.split(',')
+
+    if method == 'floor':
+        return [float(x) for x in params]
+    elif method == 'nroot':
+        return [int(x) for x in params]
+    elif method == 'reverse':
+        return [str(x) for x in params]
+    elif method == 'validAnagram' or method == 'sort':
+        return list(params)
+    
 def main():
 
     FuncHashMap = {
@@ -72,7 +72,7 @@ def main():
         os.unlink(server_address)
     except FileNotFoundError:
         pass
-
+    
     print(f'接続開始します。{server_address}')
 
     # バインド
@@ -87,10 +87,14 @@ def main():
         # 接続に対し、新しいソケットを作成
         connection, client_address = sock.accept()
         while True:
+
             try:
+
                 #クライアントからのデータを確認
                 data = connection.recv(1024)
                 from_client = data.decode()
+                
+                #jsonを取得
                 client_json = json.loads(from_client)
 
                 # パラメーターを取得
@@ -99,27 +103,29 @@ def main():
                 id = client_json['id']
 
                 if method in FuncHashMap:
-
-                    param = changeType(method, params) 
+                    
+                    param = changeType(method, params)
 
                     # メソッドを実行
-                    if param != "Error":
-                        result = FuncHashMap[method](param)
-                    else:
-                        # エラー
-                        print('エラーだよ')
-                        result = param
+                    result = FuncHashMap[method](param)
                     
                     data = {
                         'results': result,
                         'id': id,
                     }
 
-                    json_data = json.dumps(data).encode('utf-8')
+                else:
+                    # エラー
+                    data = {
+                        'results': 'そんなメソッドありません。',
+                        'id': id,
+                    }
+
+                json_data = json.dumps(data).encode('utf-8')
         
-                    # 戻り値をクライアントに返す
-                    connection.send(json_data)
-                
+                # 戻り値をクライアントに返す
+                connection.send(json_data)
+
                 break
             
             except Exception as e:

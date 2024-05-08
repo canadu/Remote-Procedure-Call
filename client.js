@@ -5,7 +5,7 @@ const host = '127.0.0.1';
 
 const req = {
     "method": "",
-    "params":"",
+    "params": "",
     "id": ""
 };
 
@@ -38,10 +38,7 @@ function readUserInput(question) {
     req.params = params == ""? req.params : params;
     req.id = id == ""? req.id : id;
 
-    req.method = method;
-
-    console.log(req.params);
-    
+    req.method = method;    
     req.params = params;
     req.id = id;
 
